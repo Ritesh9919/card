@@ -1,10 +1,12 @@
 import {useState, useEffect} from 'react';
 import axios from 'axios';
 import Card from './components/Card';
+import SearchBar from './components/SearchBar';
 
 function App() {
   
-  const [data, setData] = useState([]);
+  const [beers, setBeeres] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   
   useEffect(()=> {
@@ -12,7 +14,7 @@ function App() {
       try {
         const response = await axios.get('https://api.sampleapis.com/beers/ale');
         if(response.status == 200) {
-          setData(response.data);
+          setBeeres(response.data);
         }
       
       } catch (error) {
@@ -22,16 +24,29 @@ function App() {
     })()
   },[]);
 
+
+  const handleSearch = (e)=> {
+    setSearchTerm(e.target.value);
+  }
+
+  const filterBeers = beers.filter((beer)=> {
+    return beer.name.toLowerCase().includes(searchTerm.toLowerCase());
+  })
+
   return (
+    <>
+    <SearchBar searchTerm={searchTerm} handleSearch={handleSearch} />
     <div className='d-flex justify-content-evenly align-items-center flex-wrap mt-5'>
-      {data.map((d)=> {
+      
+      {filterBeers.map((beer)=> {
         return (
         
-          <Card data={d} key={d.id}/>
+          <Card beer={beer} key={beer.id}/>
           
         )
       })}
     </div>
+    </>
   )
 }
 
